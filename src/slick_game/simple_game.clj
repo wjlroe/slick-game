@@ -1,6 +1,13 @@
 (ns slick-game.simple-game
   (:import
-   [org.newdawn.slick AppGameContainer BasicGame GameContainer Graphics SlickException Image Input]))
+   [org.newdawn.slick
+    AppGameContainer
+    BasicGame
+    GameContainer
+    Graphics
+    SlickException
+    Image
+    Input]))
 
 (def land (ref nil))
 (def plane (ref nil))
@@ -13,6 +20,17 @@
   (/ value
      (* 2 scale)))
 
+(def float+
+  (comp float +))
+(def float-
+  (comp float -))
+(def float*
+  (comp float *))
+
+(defn isInput
+  [key input]
+  (.isKeyDown input key))
+
 (defn -main
   []
   (let [app (AppGameContainer. (proxy [BasicGame] ["SlickGame - SimpleGame from Clojure"]
@@ -21,39 +39,46 @@
                                     (ref-set land (Image. "data/land.jpg"))
                                     (ref-set plane (Image. "data/plane.png"))))
                                  (update [gc delta]
-                                   (let [input (. gc getInput)]
-                                     (cond
-                                      (. input isKeyDown Input/KEY_A)
-                                      (. @plane rotate (float (* -0.2 delta)))
-                                      (. input isKeyDown Input/KEY_D)
-                                      (. @plane rotate (float (* 0.2 delta)))
-                                      (. input isKeyDown Input/KEY_W)
-                                      (let [hip (float (* 0.4 delta))
-                                            rotation (. @plane getRotation)]
-                                        (dosync
-                                         (ref-set plane-x (float (+ @plane-x (* hip (. Math sin (. Math toRadians rotation))))))
-                                         (ref-set plane-y (float (- @plane-y (* hip (. Math cos (. Math toRadians rotation))))))))
-                                      (. input isKeyDown Input/KEY_2)
-                                      (dosync
-                                       (ref-set scale (float
-                                                       (+ @scale (if (>= @scale 5.0)
-                                                                   0
-                                                                   0.1))))
-                                       (. @plane setCenterOfRotation
-                                          (middle-scale (. @plane getWidth) @scale)
-                                          (middle-scale (. @plane getHeight) @scale)))
-                                      (. input isKeyDown Input/KEY_1)
-                                      (dosync
-                                       (ref-set scale (float
-                                                       (- @scale (if (<= @scale 1.0)
-                                                                   0
-                                                                   0.1))))
-                                       (. @plane setCenterOfRotation
-                                          (middle-scale (. @plane getWidth) @scale)
-                                          (middle-scale (. @plane getHeight) @scale))))))
+                                   (let [input (.getInput gc)]
+                                     (condp isInput input
+
+                                       Input/KEY_A
+                                       (.rotate @plane (float (* -0.2 delta)))
+
+                                       Input/KEY_D
+                                       (.rotate @plane (float (* 0.2 delta)))
+
+                                       Input/KEY_W
+                                       (let [hip (* 0.4 delta)
+                                             rotation (. @plane getRotation)]
+                                         (dosync
+                                          (alter plane-x float+
+                                                 (* hip (Math/sin (Math/toRadians rotation))))
+                                          (alter plane-y float-
+                                                 (* hip (Math/cos (Math/toRadians rotation))))))
+
+                                       Input/KEY_2
+                                       (dosync
+                                        (alter scale float+
+                                               (if (>= @scale 5.0)
+                                                 0
+                                                 0.1))
+                                        (.setCenterOfRotation @plane
+                                                              (middle-scale (.getWidth @plane) @scale)
+                                                              (middle-scale (.getHeight @plane) @scale)))
+
+                                       Input/KEY_1
+                                       (dosync
+                                        (alter scale float-
+                                               (if (<= @scale 1.0)
+                                                 0
+                                                 0.1))
+                                        (.setCenterOfRotation @plane
+                                                              (middle-scale (.getWidth @plane) @scale)
+                                                              (middle-scale (.getHeight @plane) @scale))))))
                                  (render [gc g]
-                                   (. @land draw 0 0)
-                                   (. @plane draw @plane-x @plane-y @scale))))]
+                                   (.draw @land 0 0)
+                                   (.draw @plane @plane-x @plane-y @scale))))]
     (doto app
       (.setDisplayMode 800 600 false)
       (.start))))
