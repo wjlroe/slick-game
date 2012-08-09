@@ -9,6 +9,10 @@ of Java directly.
 
     lein run
 
+## Current status
+
+![](wjlroe.github.com/slick-game/img/falling.gif)
+
 ## License
 
 Copyright © 2012 William Roe
