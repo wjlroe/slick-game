@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+rm -rf grabs
+mkdir grabs
+
+export JAVA_HOME=`/usr/libexec/java_home -v 1.6`
+
+lein2 run
+
+echo 'Converting to animated gif...'
+convert -delay 50 -loop 0 grabs/*.png grabs/game.gif
+echo 'Done.'

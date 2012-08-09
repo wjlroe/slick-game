@@ -7,7 +7,9 @@
     Graphics
     SlickException
     Image
-    Input]))
+    Input]
+   [org.newdawn.slick.imageout
+    ImageOut]))
 
 (def ^:dynamic *display-width* 800)
 (def ^:dynamic *display-height* 600)
@@ -16,6 +18,7 @@
 (def falling-squares (ref []))
 (def last-move (ref 0))
 (def delta-countdown (ref 0))
+(def capturenum (ref 0))
 
 (defn basic-square
   []
@@ -104,6 +107,17 @@
   []
   (ref-set falling-squares (map shift-down @falling-squares)))
 
+(defn grab-screen
+  [gc]
+  (let [screen (Image. *display-width* *display-height*)]
+    (do
+      (-> gc
+          (.getGraphics)
+          (.copyArea screen 0 0))
+      (ImageOut/write screen ImageOut/PNG
+                      (format "grabs/screen%03d.png"
+                              (dosync (alter capturenum + 1)))))))
+
 (defn input-event
   "Shove new shape in the world every x seconds"
   [gc delta]
@@ -111,6 +125,7 @@
     (alter delta-countdown - delta)
     (when (< @delta-countdown 0)
       (move-pieces-down)
+      (grab-screen gc)
       (ref-set delta-countdown *falling-speed*))))
 
 (defn render-world
