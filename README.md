@@ -11,7 +11,7 @@ of Java directly.
 
 ## Current status
 
-![](wjlroe.github.com/slick-game/img/falling.gif)
+![](http://wjlroe.github.com/slick-game/images/falling.gif)
 
 ## License
 

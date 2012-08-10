@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -u
+set -e
+
+if [ ! -d gh-pages ]; then
+   git clone git@github.com:wjlroe/slick-game.git gh-pages
+   cd gh-pages
+   git co -b gh-pages origin/gh-pages
+else
+   cd gh-pages
+   git pull
+fi
+
+cp ../grabs/falling.gif images/
+git add images
+git commit -m 'Updating images'
+git push origin gh-pages
+cd ..
