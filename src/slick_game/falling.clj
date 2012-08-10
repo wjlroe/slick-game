@@ -110,13 +110,12 @@
 (defn grab-screen
   [gc]
   (let [screen (Image. *display-width* *display-height*)]
-    (do
-      (-> gc
-          (.getGraphics)
-          (.copyArea screen 0 0))
-      (ImageOut/write screen ImageOut/PNG
-                      (format "grabs/screen%03d.png"
-                              (dosync (alter capturenum + 1)))))))
+    (-> gc
+        (.getGraphics)
+        (.copyArea screen 0 0))
+    (ImageOut/write screen ImageOut/PNG
+                    (format "grabs/screen%03d.png"
+                            (dosync (alter capturenum + 1))))))
 
 (defn input-event
   "Shove new shape in the world every x seconds"
