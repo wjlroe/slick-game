@@ -1,5 +1,10 @@
 (ns slick-game.falling
   (:import
+   [org.lwjgl
+    LWJGLException]
+   [org.lwjgl.opengl
+    Display
+    DisplayMode]
    [org.newdawn.slick
     AppGameContainer
     BasicGame
