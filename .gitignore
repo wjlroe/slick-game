@@ -11,3 +11,4 @@ pom.xml
 /grabs
 /gh-pages
 .DS_Store
+*.jnilib
