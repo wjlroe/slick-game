@@ -11,9 +11,8 @@
   :url "https://github.com/wjlroe/slick-game"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.4.0"]
-                 [slick/slick "274"]]
+  :dependencies [[org.clojure/clojure "1.2.0"]
+                 [org.clojure/clojure-contrib "1.2.0"]
+                 [penumbra "0.6.0"]]
   :repositories {"slick" "http://slick.cokeandcode.com/mavenrepo/"}
-  :jvm-opts [~(str "-Djava.library.path=" (get-native-lib-path (System/getProperty "os.name")))]
-  :main slick-game.falling
-  :aot :all)
+  :jvm-opts [~(str "-Djava.library.path=" (get-native-lib-path (System/getProperty "os.name")))])
