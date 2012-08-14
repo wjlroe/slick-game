@@ -1,4 +1,6 @@
 (ns slick-game.controller
+  (:use
+   slick-game.game-interface)
   (:require [slick-game.swing-game :as swing]))
 
 ;; ## Utility functions
@@ -20,7 +22,7 @@
     (let [curr-time (get-time)
           delta (- curr-time last-time)
           world (game-logic world delta)]
-      (swing/render interface world)
+      (render interface world)
       (when (swing/running?)
         (Thread/sleep 10)
         (recur curr-time)))))
@@ -30,7 +32,7 @@
   (let [world {} ;; We need to create an actual game
         interface (swing/new-interface)]
     (do
-      (swing/init interface "ZOMG Game!!11!")
+      (init interface "ZOMG Game!!11!")
       ;; game loop
       (game-loop interface world))))
 

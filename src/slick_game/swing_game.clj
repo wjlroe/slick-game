@@ -1,15 +1,12 @@
 (ns slick-game.swing-game
   (:use
+   slick-game.game-interface
    clojure.java.io)
   (:import [java.awt.image BufferedImage]
            [java.awt.event KeyAdapter MouseAdapter WindowAdapter]
            [java.awt Canvas Dimension Graphics2D]
            [javax.imageio ImageIO]
            [javax.swing JFrame JPanel]))
-
-(defprotocol GAMEINTERFACE
-  (init [interface game-name])
-  (render [interface world]))
 
 ;; ## Some config vars
 
