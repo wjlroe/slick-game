@@ -15,5 +15,5 @@
                  [slick/slick "274"]]
   :repositories {"slick" "http://slick.cokeandcode.com/mavenrepo/"}
   :jvm-opts [~(str "-Djava.library.path=" (get-native-lib-path (System/getProperty "os.name")))]
-  :main slick-game.falling
-  :aot :all)
+  :main slick-game.controller
+  :aot [slick-game.controller])
