@@ -22,7 +22,8 @@
 
 (defn stop-game
   []
-  (ref-set running false))
+  (dosync
+   (ref-set running false)))
 
 (defn running?
   []
@@ -54,13 +55,13 @@
       (.addKeyListener (proxy [KeyAdapter] []
                          (keyPressed [e] (handle-keypress e))))
       (.addMouseListener (proxy [MouseAdapter] []
-                           (mouseClicked [e] (handle-mouse e))))
-      (.createBufferStrategy 2))
+                           (mouseClicked [e] (handle-mouse e)))))
     (.add panel newcanvas)
     (doto frame
       (.pack)
       (.setResizable false)
       (.setVisible true))
+    (.createBufferStrategy newcanvas 2)
     (dosync
      (ref-set canvas newcanvas))))
 

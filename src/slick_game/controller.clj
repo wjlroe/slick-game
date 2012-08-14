@@ -40,4 +40,7 @@
 
 (defn -main
   [& args]
-  (start-game))
+  (do
+    (start-game)
+    (println "Game quit")
+    (System/exit 0)))
