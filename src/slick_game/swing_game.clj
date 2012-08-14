@@ -1,12 +1,15 @@
 (ns slick-game.swing-game
   (:use
-   slick-game.game-interface
    clojure.java.io)
   (:import [java.awt.image BufferedImage]
            [java.awt.event KeyAdapter MouseAdapter WindowAdapter]
            [java.awt Canvas Dimension Graphics2D]
            [javax.imageio ImageIO]
            [javax.swing JFrame JPanel]))
+
+(defprotocol GAMEINTERFACE
+  (init [interface game-name])
+  (render [interface world]))
 
 ;; ## Some config vars
 
@@ -15,7 +18,7 @@
 
 ;; ## State vars
 
-(def canvas (ref (Canvas.)))
+(def canvas (ref nil))
 (def running (ref true))
 
 ;; ## Utility methods
@@ -23,6 +26,10 @@
 (defn stop-game
   []
   (ref-set running false))
+
+(defn running?
+  []
+  @running)
 
 ;; ## Input handling methods
 
@@ -60,10 +67,12 @@
     (dosync
      (ref-set canvas newcanvas))))
 
-(defrecord SwingInterface [running]
+(defrecord SwingInterface []
   GAMEINTERFACE
   (init [interface game-name]
     (setup-swing game-name))
-  (render [interface world])
-  (running? [interface]
-    @running))
+  (render [interface world]))
+
+(defn new-interface
+  []
+  (SwingInterface.))

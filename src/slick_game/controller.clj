@@ -21,14 +21,14 @@
           delta (- curr-time last-time)
           world (game-logic world delta)]
       (swing/render interface world)
-      (when (swing/running? interface world)
+      (when (swing/running?)
         (Thread/sleep 10)
         (recur curr-time)))))
 
 (defn start-game
   []
-  (let [game {} ;; We need to create an actual game
-        interface (map->SwingInterface {:running true})]
+  (let [world {} ;; We need to create an actual game
+        interface (swing/new-interface)]
     (do
       (swing/init interface "ZOMG Game!!11!")
       ;; game loop
