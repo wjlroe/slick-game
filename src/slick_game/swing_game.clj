@@ -44,7 +44,7 @@
   (let [#^JFrame frame (doto (JFrame. title)
                          (.addWindowListener (proxy [WindowAdapter] []
                                                (windowClosing [e] (stop-game)))))
-        #^JPanel panel (doto (.getContentPage frame)
+        #^JPanel panel (doto (.getContentPane frame)
                          (.setPreferredSize (Dimension. window-width window-height))
                          (.setLayout nil))
         #^Canvas newcanvas (Canvas.)]
