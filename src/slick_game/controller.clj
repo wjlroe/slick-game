@@ -1,7 +1,9 @@
 (ns slick-game.controller
   (:use
    slick-game.game-interface)
-  (:require [slick-game.swing-game :as swing]))
+  (:require
+   [slick-game.swing-game :as swing]
+   [slick-game.falling :as falling]))
 
 ;; ## Utility functions
 
@@ -29,7 +31,7 @@
 
 (defn start-game
   []
-  (let [world {} ;; We need to create an actual game
+  (let [world {:falling [(falling/make-shape {:x 30 :y 30})]} ;; We need to create an actual game
         interface (swing/new-interface)]
     (do
       (init interface "ZOMG Game!!11!")

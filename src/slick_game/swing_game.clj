@@ -4,9 +4,9 @@
    clojure.java.io)
   (:import [java.awt.image BufferedImage]
            [java.awt.event KeyAdapter MouseAdapter WindowAdapter]
-           [java.awt Canvas Dimension Graphics2D]
+           [java.awt Canvas Color Dimension Graphics2D]
            [javax.imageio ImageIO]
-           [javax.swing JFrame JPanel]))
+           [javax.swing JFrame JPanel JLabel]))
 
 ;; ## Some config vars
 
@@ -15,7 +15,7 @@
 
 ;; ## State vars
 
-(def canvas (ref nil))
+;;(def canvas (ref nil))
 (def running (ref true))
 
 ;; ## Utility methods
@@ -37,6 +37,16 @@
 (defn handle-mouse
   [event])
 
+(defn paint-world
+  [graphics]
+  (.setColor graphics (Color. 60 80 160))
+  (.fillRect graphics 30 30 100 100))
+
+(def canvas (proxy [JPanel] []
+              (paintComponent [g]
+                (proxy-super paintComponent g)
+                (paint-world g))))
+
 ;; ## Bootstrapping and setup
 
 (defn setup-swing
@@ -45,25 +55,26 @@
   (let [#^JFrame frame (doto (JFrame. title)
                          (.addWindowListener (proxy [WindowAdapter] []
                                                (windowClosing [e] (stop-game)))))
-        #^JPanel panel (doto (.getContentPane frame)
-                         (.setPreferredSize (Dimension. window-width window-height))
-                         (.setLayout nil))
-        #^Canvas newcanvas (Canvas.)]
-    (doto newcanvas
+
+        ;; #^JPanel panel (doto (.getContentPane frame)
+        ;;                  (.setPreferredSize (Dimension. window-width window-height))
+        ;;                  (.setLayout nil))
+        ;; #^BufferedImage img (BufferedImage. window-width window-height BufferedImage/TYPE_INT_ARGB)
+        ;; bg-image (ImageIO/read (file "data/land.jpg"))
+        ;; newcanvas (proxy [JLabel] []
+        ;;             (paint [g] (.drawImage g bg-image 0 0 this)))
+        ]
+    (doto canvas
       (.setBounds 0 0 window-width window-height)
-      (.setIgnoreRepaint true)
       (.addKeyListener (proxy [KeyAdapter] []
                          (keyPressed [e] (handle-keypress e))))
       (.addMouseListener (proxy [MouseAdapter] []
                            (mouseClicked [e] (handle-mouse e)))))
-    (.add panel newcanvas)
     (doto frame
-      (.pack)
+      (.add canvas)
+      (.setSize window-width window-height)
       (.setResizable false)
-      (.setVisible true))
-    (.createBufferStrategy newcanvas 2)
-    (dosync
-     (ref-set canvas newcanvas))))
+      (.setVisible true))))
 
 (defrecord SwingInterface []
   GAMEINTERFACE
