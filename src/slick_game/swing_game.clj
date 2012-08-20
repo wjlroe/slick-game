@@ -54,16 +54,8 @@
   [title]
   (let [#^JFrame frame (doto (JFrame. title)
                          (.addWindowListener (proxy [WindowAdapter] []
-                                               (windowClosing [e] (stop-game)))))
-
-        ;; #^JPanel panel (doto (.getContentPane frame)
-        ;;                  (.setPreferredSize (Dimension. window-width window-height))
-        ;;                  (.setLayout nil))
-        ;; #^BufferedImage img (BufferedImage. window-width window-height BufferedImage/TYPE_INT_ARGB)
-        ;; bg-image (ImageIO/read (file "data/land.jpg"))
-        ;; newcanvas (proxy [JLabel] []
-        ;;             (paint [g] (.drawImage g bg-image 0 0 this)))
-        ]
+                                               (windowClosing [e]
+                                                 (stop-game)))))]
     (doto canvas
       (.setBounds 0 0 window-width window-height)
       (.addKeyListener (proxy [KeyAdapter] []
