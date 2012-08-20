@@ -3,7 +3,7 @@
    slick-game.game-interface
    clojure.java.io)
   (:import [java.awt.image BufferedImage]
-           [java.awt.event KeyAdapter MouseAdapter WindowAdapter]
+           [java.awt.event KeyAdapter KeyEvent MouseAdapter WindowAdapter]
            [java.awt Canvas Color Dimension Graphics2D]
            [javax.imageio ImageIO]
            [javax.swing JFrame JPanel JLabel]))
@@ -32,7 +32,11 @@
 ;; ## Input handling methods
 
 (defn handle-keypress
-  [event])
+  [event]
+  (do
+    (println "key event:" event)
+    (if (= KeyEvent/VK_Q (.getKeyCode event))
+      (stop-game))))
 
 (defn handle-mouse
   [event])
@@ -42,10 +46,11 @@
   (.setColor graphics (Color. 60 80 160))
   (.fillRect graphics 30 30 100 100))
 
-(def canvas (proxy [JPanel] []
-              (paintComponent [g]
-                (proxy-super paintComponent g)
-                (paint-world g))))
+(def canvas (ref
+             (proxy [JPanel] []
+               (paintComponent [g]
+                 (proxy-super paintComponent g)
+                 (paint-world g)))))
 
 ;; ## Bootstrapping and setup
 
@@ -55,15 +60,18 @@
   (let [#^JFrame frame (doto (JFrame. title)
                          (.addWindowListener (proxy [WindowAdapter] []
                                                (windowClosing [e]
-                                                 (stop-game)))))]
-    (doto canvas
+                                                 (stop-game))))
+                         (.addKeyListener (proxy [KeyAdapter] []
+                                            (keyPressed [e] (handle-keypress e))))
+                         (.addMouseListener (proxy [MouseAdapter] []
+                                              (mouseClicked [e] (handle-mouse e)))))
+        mutable-canvas @canvas]
+    (doto mutable-canvas
       (.setBounds 0 0 window-width window-height)
-      (.addKeyListener (proxy [KeyAdapter] []
-                         (keyPressed [e] (handle-keypress e))))
-      (.addMouseListener (proxy [MouseAdapter] []
-                           (mouseClicked [e] (handle-mouse e)))))
+      )
+    (dosync (ref-set canvas mutable-canvas))
     (doto frame
-      (.add canvas)
+      (.add @canvas)
       (.setSize window-width window-height)
       (.setResizable false)
       (.setVisible true))))
