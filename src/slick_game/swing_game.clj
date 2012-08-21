@@ -15,7 +15,7 @@
 
 ;; ## State vars
 
-;;(def canvas (ref nil))
+(def graphics (ref nil))
 (def running (ref true))
 
 ;; ## Utility methods
@@ -42,15 +42,15 @@
   [event])
 
 (defn paint-world
-  [graphics]
-  (.setColor graphics (Color. 60 80 160))
-  (.fillRect graphics 30 30 100 100))
-
-(def canvas (ref
-             (proxy [JPanel] []
-               (paintComponent [g]
-                 (proxy-super paintComponent g)
-                 (paint-world g)))))
+  [world]
+  (let [g @graphics
+        falling-shapes (:falling world)]
+    (doseq [{:keys [origin blocks block-width block-height]} falling-shapes]
+      (doseq [[incx incy] blocks]
+       (let [x (+ incx (:x origin))
+             y (+ incy (:y origin))]
+         (.setColor g (Color. 60 80 160))
+         (.fillRect g x y block-width block-height))))))
 
 ;; ## Bootstrapping and setup
 
@@ -65,23 +65,22 @@
                                             (keyPressed [e] (handle-keypress e))))
                          (.addMouseListener (proxy [MouseAdapter] []
                                               (mouseClicked [e] (handle-mouse e)))))
-        mutable-canvas @canvas]
-    (doto mutable-canvas
-      (.setBounds 0 0 window-width window-height)
-      )
-    (dosync (ref-set canvas mutable-canvas))
+        background (doto (proxy
+                             [JPanel]
+                             []
+                           (paintComponent [g]
+                             (proxy-super paintComponent g)
+                             ;; paint the background pic
+                             ))
+                     (.setBounds 0 0 window-width window-height))
+        canvas (doto (proxy [JPanel] []
+                       (paintComponent [g]
+                         (proxy-super paintComponent g))))]
     (doto frame
-      (.add @canvas)
+      (.add background)
+      (.add canvas)
       (.setSize window-width window-height)
       (.setResizable false)
-      (.setVisible true))))
-
-(defrecord SwingInterface []
-  GAMEINTERFACE
-  (init [interface game-name]
-    (setup-swing game-name))
-  (render [interface world]))
-
-(defn new-interface
-  []
-  (SwingInterface.))
+      (.setVisible true))
+    (dosync
+     (ref-set graphics (.getGraphics canvas)))))

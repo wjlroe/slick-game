@@ -1,6 +1,4 @@
 (ns slick-game.controller
-  (:use
-   slick-game.game-interface)
   (:require
    [slick-game.swing-game :as swing]
    [slick-game.falling :as falling]))
@@ -14,29 +12,30 @@
 ;; stubbed logic for now
 (defn game-logic
   [world delta]
-  world)
+  (falling/simulate-world world delta))
 
 ;; ## The game loop
 
 (defn game-loop
-  [interface world]
-  (loop [last-time (get-time)]
+  [init-world]
+  (loop [world init-world
+         last-time (get-time)]
     (let [curr-time (get-time)
-          delta (- curr-time last-time)
+          delta (/ (double (- curr-time last-time))
+                   1000.0)
           world (game-logic world delta)]
-      (render interface world)
+      (swing/paint-world world)
       (when (swing/running?)
         (Thread/sleep 10)
-        (recur curr-time)))))
+        (recur world curr-time)))))
 
 (defn start-game
   []
-  (let [world {:falling [(falling/make-shape {:x 30 :y 30})]} ;; We need to create an actual game
-        interface (swing/new-interface)]
+  (let [world {:falling [(falling/make-shape {:x 30 :y 30})]}]
     (do
-      (init interface "ZOMG Game!!11!")
+      (swing/setup-swing "ZOMG Game!!11!")
       ;; game loop
-      (game-loop interface world))))
+      (game-loop world))))
 
 ;; ## Main method to run the game from the command line
 

@@ -6,7 +6,7 @@
 
 ;; (def falling-squares (ref []))
 ;; (def last-move (ref 0))
-;; (def delta-countdown (ref 0))
+(def delta-countdown (ref 0))
 ;; (def capturenum (ref 0))
 
 ;; (defn basic-square
@@ -64,6 +64,8 @@
   "Make a shape. Either return the shape required or a random one."
   [origin & shape-name]
   {:origin origin
+   :block-width sq-width
+   :block-height sq-height
    :blocks
    (apply get-shape shape-name)})
 
@@ -91,9 +93,9 @@
 ;;   (dosync
 ;;    (ref-set falling-squares [(make-shape {:x (midpoint) :y 0})])))
 
-;; (defn move-pieces-down
-;;   []
-;;   (ref-set falling-squares (map shift-down @falling-squares)))
+(defn move-pieces-down
+  [{:keys [falling] :as world}]
+  (assoc world :falling (map shift-down falling)))
 
 ;; (defn grab-screen
 ;;   [gc]
@@ -114,6 +116,17 @@
 ;;      (move-pieces-down)
 ;;      (grab-screen gc)
 ;;      (ref-set delta-countdown *falling-speed*))))
+
+(defn simulate-world
+  "Check the time since last state change. Return modified world if over threshold"
+  [world delta]
+  (dosync
+   (alter delta-countdown - delta)
+   (if (< @delta-countdown 0)
+     (let [world (move-pieces-down world)]
+       (ref-set delta-countdown *falling-speed*)
+       world)
+     world)))
 
 ;; (defn render-world
 ;;   "Loop through all placed shapes, rendering them"
